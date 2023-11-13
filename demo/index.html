@@ -14,29 +14,45 @@
   <script type="module" src="../lit-movable.js"></script>
 </head>
 <body>
-<div style="display: flex;height:200px">
-  <div style="width:50%">
+<div style="display: flex;height:250px">
+  <div style="width:33%">
     <lit-movable>
       <div style="background:lightsteelblue">move me anywhere</div>
     </lit-movable>
   </div>
-  <div style="width:50%">
+  <div style="width:33%">
     <lit-movable horizontal="-50,250">
       <div style="background:lightsteelblue">Move me horizontally</div>
     </lit-movable>
   </div>
+  <div style="width:33%">
+    <div style="height:200px;width:200px;border:solid 1px blue;" id="dialog">
+      <lit-movable targetSelector="#dialog">
+        <div style="background:lightsteelblue;width:100%">I am a draggable title</div>
+      </lit-movable>
+      I am not directly grabbable, but I will move if you grab my title.
+    </div>
+  </div>
+
 </div>
 <div style="display: flex; height:50%">
-  <div style="width:50%">
+  <div style="width:33%">
     <lit-movable grid="50" shiftBehavior="true">
       <div style="background:lightsteelblue">my grid is 50 <br>(try holding shift while dragging)</div>
     </lit-movable>
   </div>
-
-  <div style="width:50%">
+  <div style="width:33%">
     <lit-movable vertical="-999,9999">
       <div style="background:lightsteelblue">Move me vertically</div>
     </lit-movable>
+  </div>
+  <div style="width:33%;">
+    <div style="height:200px;width:200px;border:solid 1px green;position:relative">
+      <lit-movable posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
+        <div style="background:lightsteelblue;width:30px;margin-left:-15px;height:18px;margin-top:-9px">box</div>
+      </lit-movable>
+    </div>
+
   </div>
 </div>
 

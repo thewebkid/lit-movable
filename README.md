@@ -34,8 +34,9 @@ npm i lit-movable
 - **disabled**: _Bool_ - Disables movement behavior.
 - **eventsOnly**: _Bool_ - (advanced) Only fires movement events, but will not move the element.
 
+
 ## Events 
-Exposes events as callback properties or built in custom events
+Lit-Movable exposes events as either callback properties or the built in custom events.
 
 ### Event Properties
 - **onstart**: called immediately after the pointerdown event on the element
@@ -73,28 +74,30 @@ Exposes events as callback properties or built in custom events
 ```
 
 ## More usage examples
-Constrain vertical movement. Allow -50->250 horizontal movement. 2 ways to accomplish this.
+Constrain vertical movement. Allow -50 -> 250 horizontal movement. Here are two ways to accomplish the identical behavior.
 ```html
+    <!-- Set horizontal movement only -->
     <lit-movable horizontal="-50,250">
       <div style="background:lightsteelblue">Move me horizontally</div>
     </lit-movable>
 
-<!-- OR -->
-<lit-movable boundsX="-50,250" boundsY="null">
-  <div style="background:lightsteelblue">Move me horizontally</div>
-</lit-movable>
-
-
+  <!-- OR -->
+  <!-- Explicit x/y boundaries. Null string constrains an axis -->
+  <lit-movable boundsX="-50,250" boundsY="null">
+    <div style="background:lightsteelblue">Move me horizontally</div>
+  </lit-movable>
 ```
+
 Two identical ways to constrain horizontal movement, but enable broad vertical motion. 
 ```html
-    <lit-movable vertical="-999,9999">
-      <div style="background:lightsteelblue">Move me vertically</div>
-    </lit-movable>
-    <!-- Alternate equivalent -->
-    <lit-movable boundsY="-999,9999" boundsX="null">
-      <div style="background:lightsteelblue">Move me horizontally</div>
-    </lit-movable>
+  <!-- Set vertical movement only -->
+  <lit-movable vertical="-999,9999">
+    <div style="background:lightsteelblue">Move me vertically</div>
+  </lit-movable>
+  <!-- Alternate explicit bounds (x,y) equivalent. Null = no movement enabled -->
+  <lit-movable boundsY="-999,9999" boundsX="null">
+    <div style="background:lightsteelblue">Move me horizontally</div>
+  </lit-movable>
 ```
 
 Snap to 50px grid with shift key behavior.
@@ -102,4 +105,25 @@ Snap to 50px grid with shift key behavior.
   <lit-movable grid="50" shiftBehavior="true">
     <div style="background:lightsteelblue">my grid is 50 <br>(try holding shift while dragging)</div>
   </lit-movable>
+```
+
+Start in middle of a constrained box.
+```html
+  <div style="height:200px;width:200px;border:solid 1px green;position:relative">
+    <lit-movable posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
+      <div style="background:lightsteelblue;width:30px;margin-left:-15px;height:18px;margin-top:-9px">
+        box
+      </div>
+    </lit-movable>
+  </div>
+```
+
+Modal behavior with draggable title using targetSelector attribute.
+```html
+  <div style="height:200px;width:200px;border:solid 1px blue;" id="dialog">
+    <lit-movable targetSelector="#dialog">
+      <div style="background:lightsteelblue;width:100%">I am a draggable title</div>
+    </lit-movable>
+    I am not directly grabbable, but I will move if you grab my title.
+  </div>
 ```
