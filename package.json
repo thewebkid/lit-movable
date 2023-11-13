@@ -11,6 +11,10 @@
     ".": "./index.js",
     "./lit-movable.js": "./lit-movable.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thewebkid/lit-movable.git"
+  },
   "scripts": {
     "analyze": "cem analyze --litelement",
     "start": "web-dev-server"
