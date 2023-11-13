@@ -131,7 +131,7 @@ export class LitMovable extends LitElement {
   }
   set vertical(v){
     this.boundsY = v;
-    this.boundsX = null;
+    this.boundsX = 'null';
     this._vertical = v;
   }
   get horizontal(){
@@ -139,7 +139,7 @@ export class LitMovable extends LitElement {
   }
   set horizontal(v){
     this.boundsX = v;
-    this.boundsY = null;
+    this.boundsY = 'null';
     this._horizontal = v;
   }
 
@@ -276,6 +276,7 @@ export class LitMovable extends LitElement {
 
     target.style.position = 'absolute';
     target.style.cursor = 'pointer';
+    console.log(bounds)
     if (posLeft){
       target.style.left = posLeft + 'px';
     }

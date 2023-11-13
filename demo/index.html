@@ -3,17 +3,42 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body {
+    html,body {
       background: #fafafa;
+      height:100%;
+    }
+    div{
+      position:relative;
     }
   </style>
+  <script type="module" src="../lit-movable.js"></script>
 </head>
 <body>
-  <div id="demo"></div>
+<div style="display: flex;height:200px">
+  <div style="width:50%">
+    <lit-movable>
+      <div style="background:lightsteelblue">move me anywhere</div>
+    </lit-movable>
+  </div>
+  <div style="width:50%">
+    <lit-movable horizontal="-50,250">
+      <div style="background:lightsteelblue">Move me horizontally</div>
+    </lit-movable>
+  </div>
+</div>
+<div style="display: flex; height:50%">
+  <div style="width:50%">
+    <lit-movable grid="50" shiftBehavior="true">
+      <div style="background:lightsteelblue">my grid is 50 <br>(try holding shift while dragging)</div>
+    </lit-movable>
+  </div>
 
-  <script type="module" src="../lit-movable.js"></script>
-  <lit-movable>
-    <div style="background:lightsteelblue">I am movable</div>
-  </lit-movable>
+  <div style="width:50%">
+    <lit-movable vertical="-999,9999">
+      <div style="background:lightsteelblue">Move me vertically</div>
+    </lit-movable>
+  </div>
+</div>
+
 </body>
 </html>

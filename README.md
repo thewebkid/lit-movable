@@ -72,7 +72,34 @@ Exposes events as callback properties or built in custom events
  
 ```
 
+## More usage examples
+Constrain vertical movement. Allow -50->250 horizontal movement. 2 ways to accomplish this.
+```html
+    <lit-movable horizontal="-50,250">
+      <div style="background:lightsteelblue">Move me horizontally</div>
+    </lit-movable>
+
+<!-- OR -->
+<lit-movable boundsX="-50,250" boundsY="null">
+  <div style="background:lightsteelblue">Move me horizontally</div>
+</lit-movable>
 
 
+```
+Two identical ways to constrain horizontal movement, but enable broad vertical motion. 
+```html
+    <lit-movable vertical="-999,9999">
+      <div style="background:lightsteelblue">Move me vertically</div>
+    </lit-movable>
+    <!-- Alternate equivalent -->
+    <lit-movable boundsY="-999,9999" boundsX="null">
+      <div style="background:lightsteelblue">Move me horizontally</div>
+    </lit-movable>
+```
 
-More usage examples coming soon.
+Snap to 50px grid with shift key behavior.
+```html
+  <lit-movable grid="50" shiftBehavior="true">
+    <div style="background:lightsteelblue">my grid is 50 <br>(try holding shift while dragging)</div>
+  </lit-movable>
+```
