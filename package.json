@@ -1,9 +1,10 @@
 {
   "name": "lit-movable",
-  "description": "Webcomponent lit-movable following open-wc recommendations",
+  "description": "A Lit 3 wrapper web component that can enable robustly customizable element move operations and expose rich state data.",
+  "keywords": ["web-component","lit","movable"],
   "license": "MIT",
   "author": "lit-movable",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
