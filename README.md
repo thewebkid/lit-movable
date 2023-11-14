@@ -1,6 +1,6 @@
 # \<lit-movable>
 
-A Lit 3 wrapper web component that can enable robustly customizable element move operations and expose rich state data.
+Movable element - simple and robust. A Lit 3 wrapper web component that can enable customizable element move operations and expose pointer state data.
 
 ## Installation
 
