@@ -217,8 +217,8 @@ export class LitMovable extends LitElement {
   static properties = {
     //set the left/top position
     // defaults to  element.offsetTop /offsetLeft
-    posLeft: { type: Number, reflect: true },
-    posTop: { type: Number, reflect: true },
+    posLeft: { type: Number },
+    posTop: { type: Number },
 
     // target element that moves - defaults to root element
     target: { type: Object, attribute: false, state: true },
@@ -276,7 +276,7 @@ export class LitMovable extends LitElement {
 
     target.style.position = 'absolute';
     target.style.cursor = 'pointer';
-    console.log(bounds)
+
     if (posLeft){
       target.style.left = posLeft + 'px';
     }
