@@ -10,8 +10,6 @@ const zeroIfNaN = v => {
   return v;
 };
 class Coord{
-  x;
-  y;
   constructor(x, y){
     this.x = zeroIfNaN(x);
     this.y = zeroIfNaN(y);
@@ -51,12 +49,10 @@ const getClickOffset = (event) => {
   return new Coord(x, y);
 };
 class MoveBounds {
-  min = -Infinity;
-  max = Infinity;
-  attr = '';
   constructor(min = -Infinity, max = Infinity) {
     this.min = min;
     this.max = max;
+    this.attr = '';
   }
   get constrained(){
     return this.min === this.max;
