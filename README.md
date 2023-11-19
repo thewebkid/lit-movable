@@ -1,4 +1,4 @@
-# \<lit-movable>
+# \<lit-movable> [![npm version](https://badge.fury.io/js/lit-movable.svg)](https://badge.fury.io/js/lit-movable) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Movable element - simple and robust. A Lit 3 wrapper web component that can enable customizable element move operations and expose pointer state data.
 
