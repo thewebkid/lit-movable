@@ -15,8 +15,9 @@ npm i lit-movable
 ## Basic Usage
 
 ```html
+
 <script type="module">
-  import 'lit-movable/lit-movable.js';
+  import {LitMovable} from 'lit-movable';
 </script>
 
 <lit-movable>
