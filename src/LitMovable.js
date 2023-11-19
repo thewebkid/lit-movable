@@ -260,8 +260,6 @@ export class LitMovable extends LitElement {
     onmove: {type: Object}
   };
 
-
-
   firstUpdated(props) {
 
     let {bounds, target, posTop, posLeft} = this;
@@ -294,7 +292,6 @@ export class LitMovable extends LitElement {
   }
 
   reposition(pos) {
-
     if (typeof pos === 'object'){
       const { eventsOnly, target } = this;
       this.posTop = pos.top;

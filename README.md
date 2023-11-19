@@ -2,6 +2,8 @@
 
 Movable element - simple and robust. A Lit 3 wrapper web component that can enable customizable element move operations and expose pointer state data.
 
+This will run on node 16 locally with vite, though you will see a warning in the console. Honestly, I have to sort out the rollup config as I am having a hard time dogfooding my own module in other projects. Please reach out or give me a pull request if you are good with vite or rollup. 
+
 ## Installation
 
 ```bash
@@ -74,6 +76,19 @@ Lit-Movable exposes events as either callback properties or the built in custom 
 ```
 
 ## More usage examples
+
+#### Modal behavior
+Parent moves when title is dragged. Used targetSelector attribute.
+```html
+  <div style="height:200px;width:200px;border:solid 1px blue;" id="dialog">
+    <lit-movable targetSelector="#dialog">
+      <div style="background:lightsteelblue;width:100%">I am a draggable title</div>
+    </lit-movable>
+    I am not directly grabbable, but I will move if you grab my title.
+  </div>
+```
+
+#### Horizontal only
 Constrain vertical movement. Allow -50 -> 250 horizontal movement. Here are two ways to accomplish the identical behavior.
 ```html
     <!-- Set horizontal movement only -->
@@ -88,6 +103,7 @@ Constrain vertical movement. Allow -50 -> 250 horizontal movement. Here are two 
   </lit-movable>
 ```
 
+#### Vertical only
 Two identical ways to constrain horizontal movement, but enable broad vertical motion. 
 ```html
   <!-- Set vertical movement only -->
@@ -100,13 +116,15 @@ Two identical ways to constrain horizontal movement, but enable broad vertical m
   </lit-movable>
 ```
 
-Snap to 50px grid with shift key behavior.
+#### Snapping / shift key option enabled
+Snaps to a 50px grid with shift key behavior.
 ```html
   <lit-movable grid="50" shiftBehavior="true">
     <div style="background:lightsteelblue">my grid is 50 <br>(try holding shift while dragging)</div>
   </lit-movable>
 ```
 
+#### Constrain both directions
 Start in middle of a constrained box.
 ```html
   <div style="height:200px;width:200px;border:solid 1px green;position:relative">
@@ -115,15 +133,5 @@ Start in middle of a constrained box.
         box
       </div>
     </lit-movable>
-  </div>
-```
-
-Modal behavior with draggable title using targetSelector attribute.
-```html
-  <div style="height:200px;width:200px;border:solid 1px blue;" id="dialog">
-    <lit-movable targetSelector="#dialog">
-      <div style="background:lightsteelblue;width:100%">I am a draggable title</div>
-    </lit-movable>
-    I am not directly grabbable, but I will move if you grab my title.
   </div>
 ```
