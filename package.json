@@ -10,7 +10,7 @@
   ],
   "license": "MIT",
   "author": "Ron Gilchrist (thewebkid)",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
