@@ -408,9 +408,6 @@ export class LitMovable extends LitElement {
 
   render() {
     return html`<slot></slot>`;
-
-
   }
 }
 
-customElements.define('lit-movable', LitMovable);
