@@ -2,7 +2,7 @@
 
 Movable element - simple and robust. A Lit 3 wrapper web component that can enable customizable element move operations and expose pointer state data.
 
-This will run on node 16 locally with vite, though you will see a warning in the console. Honestly, I have to sort out the rollup config as I am having a hard time dogfooding my own module in other projects. Please reach out or give me a pull request if you are good with vite or rollup. 
+This will run on node 16 locally with vite, though you will see a warning in the console.  
 
 ## Installation
 

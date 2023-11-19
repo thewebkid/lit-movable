@@ -176,8 +176,11 @@ export class LitMovable extends LitElement {
     };
   }
 
+
   set targetSelector(v) {
+
     this._targetSelector = v;
+    this._retryTarget = document.querySelector(v) === null;
     this._target = document.querySelector(v);
   }
   get targetSelector(){return this._targetSelector;}
@@ -262,6 +265,9 @@ export class LitMovable extends LitElement {
 
   firstUpdated(props) {
 
+    if (this._retryTarget){ // element wasn't loaded
+      this.target = document.querySelector(this.targetSelector);
+    }
     let {bounds, target, posTop, posLeft} = this;
 
     let {offsetLeft, offsetTop, style: {left, top}} = this.target;
