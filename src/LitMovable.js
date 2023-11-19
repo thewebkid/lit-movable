@@ -1,4 +1,4 @@
-import { css, LitElement, html } from 'lit';
+import { LitElement, html } from 'lit';
 
 const pxVal = v => isFinite(v) ? Number(v) : Number(v.replace(/[^0-9.\-]/g, ''));
 
@@ -417,3 +417,4 @@ export class LitMovable extends LitElement {
   }
 }
 
+window.customElements.define('lit-movable', LitMovable);
