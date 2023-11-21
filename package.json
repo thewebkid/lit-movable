@@ -10,13 +10,14 @@
   ],
   "license": "MIT",
   "author": "Ron Gilchrist (thewebkid)",
-  "version": "0.1.12",
+  "version": "0.1.14",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
   "exports": {
     ".": "./index.js"
   },
+  "homepage": "http://thewebkid.com/modules/lit-movable",
   "repository": {
     "type": "git",
     "url": "https://github.com/thewebkid/lit-movable.git"
@@ -24,12 +25,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "web-test-runner test/**/*.test.js --coverage --node-resolve --puppeteer"
   },
   "dependencies": {
     "lit": "^3.1.0"
   },
   "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@web/test-runner": "^0.18.0",
+    "@web/test-runner-commands": "^0.9.0",
+    "@web/test-runner-puppeteer": "^0.15.0",
     "vite": "^5.0.0"
   },
   "customElements": "custom-elements.json"

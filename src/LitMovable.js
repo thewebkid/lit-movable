@@ -397,6 +397,7 @@ export class LitMovable extends LitElement {
     this.eventBroker('move', event);
   }
   pointerdown(event){
+
     document.body.setPointerCapture(event.pointerId);
     event.preventDefault();
     event.stopPropagation();
