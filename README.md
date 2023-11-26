@@ -4,7 +4,6 @@ Movable element - simple and robust. A Lit 3 wrapper web component that can enab
 
 [Live Demo](http://thewebkid.com/modules/lit-movable)
 
-This will run on node 16 locally with vite, though you will see a warning in the console.  
 
 ## Installation
 
@@ -15,11 +14,9 @@ npm i lit-movable
 ## Basic Usage
 
 ```html
-
 <script type="module">
   import {LitMovable} from 'lit-movable';
 </script>
-
 <lit-movable>
   <div style="background:lightsteelblue">I am movable</div>
 </lit-movable>
@@ -138,3 +135,16 @@ Start in middle of a constrained box.
     </lit-movable>
   </div>
 ```
+
+
+## Run local
+Uses vite. Will run on node 16+ but will complain about compatibility if you are stuck on node 16 like me. Ignore this. It's fine.
+```bash
+git clone https://github.com/thewebkid/lit-movable.git
+cd ./lit-movable
+npm i
+npm dev
+```
+
+## Need more help?
+I am open to work if you need a dev like me. Snatch me up. My portfolio and the link to my LinkedIn are on https://thewebkid.com :)
