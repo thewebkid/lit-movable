@@ -1,9 +1,10 @@
 # \<lit-movable> [![npm version](https://badge.fury.io/js/lit-movable.svg)](https://badge.fury.io/js/lit-movable) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Movable element - simple and robust. A Lit 3 wrapper web component that can enable customizable element move operations and expose pointer state data.
+Movable element - simple and robust. A wrapper web component that can enable customizable element move operations and expose pointer state data.
 
 [Live Demo](http://thewebkid.com/modules/lit-movable)
 
+Since this is a [Lit 3 web component](https://lit.dev/), this will work inside any SPA framework. [React integration docs](https://lit.dev/docs/frameworks/react/). Framework-agnostic web components are the future!
 
 ## Installation
 
