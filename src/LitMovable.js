@@ -272,7 +272,7 @@ export class LitMovable extends LitElement {
 
     let {offsetLeft, offsetTop, style: {left, top}} = this.target;
     target.classList.add('--movable-base');
-    target.addEventListener('pointerdown', (e) => this.pointerdown(e));
+    this.renderRoot.addEventListener('pointerdown', (e) => this.pointerdown(e));
 
     target.style.position = 'absolute';
     target.style.cursor = 'pointer';

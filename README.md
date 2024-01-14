@@ -42,14 +42,14 @@ npm i lit-movable
 Lit-Movable exposes events as either callback properties or the built in custom events.
 
 ### Event Properties
-- **onstart**: called immediately after the pointerdown event on the element
+- **onmovestart**: called immediately after the pointerdown event on the element
 - **onmove**: called continuously while moving
-- **oncomplete**: called after the pointerup event on the element
+- **onmoveend**: called after the pointerup event on the element
 
 ### Custom Events
-- **start**: fires immediately after the pointerdown event on the element
+- **movestart**: fires immediately after the pointerdown event on the element
 - **move**: fires continuously while moving
-- **complete**: fires after the pointerup event on the element
+- **moveend**: fires after the pointerup event on the element
 
 ### Event binding examples
 ```html
