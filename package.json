@@ -10,12 +10,12 @@
   ],
   "license": "MIT",
   "author": "Ron Gilchrist (thewebkid)",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "type": "module",
-  "main": "index.js",
-  "module": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./index.js"
   },
   "homepage": "http://thewebkid.com/modules/lit-movable",
   "repository": {
