@@ -10,10 +10,10 @@
   ],
   "license": "MIT",
   "author": "Ron Gilchrist (thewebkid)",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "index.js",
+  "module": "index.js",
   "exports": {
     ".": "./index.js"
   },
