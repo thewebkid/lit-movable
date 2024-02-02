@@ -7,7 +7,7 @@ export default defineConfig({
     copyPublicDir:false,
     lib: {
       // Could also be a dictionary or array of multiple entry points
-      entry: resolve(__dirname, ''),
+      entry: resolve(__dirname, 'build.js'),
       name: 'lit-movable',
       // the proper extensions will be added
       fileName: 'index',
