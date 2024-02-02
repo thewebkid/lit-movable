@@ -104,6 +104,8 @@ class MoveBounds {
  *
  * @tag lit-movable
  */
+
+
 export class LitMovable extends LitElement {
   _target;
   _targetSelector = null;
@@ -257,7 +259,7 @@ export class LitMovable extends LitElement {
     // advanced mode: Does not move the element, but fires
     // events so you can pass to your own handler
     eventsOnly: { type: Boolean },
-
+    listening: { type: Boolean},
     onmovestart: {type: Object},
     onmoveend: {type: Object},
     onmove: {type: Object}
@@ -344,16 +346,18 @@ export class LitMovable extends LitElement {
   }
   unbind(event){
     this.pointerId = null;
-    this.isMoving = false;
     document.body.removeEventListener('pointermove', (e) => this.motionHandler(e));
     this.moveEnd(event);
   }
 
   moveEnd(event){
-    document.body.removeEventListener('pointerup', e => this.unbind(e));
-    this.isMoving = this.moveState.isMoving = false;
-    this.reposition(false);
-    this.eventBroker('moveend', event);
+
+    if (this.isMoving) {
+      //document.body.removeEventListener('pointerup', ()=>this.unbind);
+      this.isMoving = this.moveState.isMoving = false;
+      this.reposition(false);
+      this.eventBroker('moveend', event);
+    }
   }
 
   motionHandler(event) {//onpointermove
@@ -404,12 +408,20 @@ export class LitMovable extends LitElement {
     if (event.pointerId !== undefined) {
       this.pointerId = event.pointerId;
     }
-    document.body.addEventListener('pointerup', event => this.unbind(event), false);
-    document.body.addEventListener('pointermove', event => {
-      if (this.pointerId !== undefined && event.pointerId === this.pointerId) {
-        this.motionHandler(event);
-      }
-    }, false);
+
+    if (!this.listening){
+      document.body.addEventListener('pointerup', event => {
+        if (this.isMoving) {
+          this.unbind(event)
+        }
+      }, false);
+      document.body.addEventListener('pointermove', event => {
+        if (this.pointerId !== undefined && event.pointerId === this.pointerId) {
+          this.motionHandler(event);
+        }
+      }, false);
+    }
+    this.listening = true;
     this.moveInit(event);
   }
 

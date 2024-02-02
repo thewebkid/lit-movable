@@ -49,13 +49,16 @@
   </div>
   <div style="width:33%;">
     <div style="height:200px;width:200px;border:solid 1px green;position:relative">
-      <lit-movable posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
+      <lit-movable posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100" id="box">
         <div style="background:lightsteelblue;width:30px;margin-left:-15px;height:18px;margin-top:-9px">box</div>
       </lit-movable>
     </div>
 
   </div>
 </div>
+<script>
+  document.getElementById('box').addEventListener('moveend', e=>console.log(e))
+</script>
 
 </body>
 </html>
