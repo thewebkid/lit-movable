@@ -808,3 +808,6 @@ f(dt, "properties", {
   onmove: { type: Object }
 });
 window.customElements.define("lit-movable", dt);
+export {
+  dt as LitMovable
+};

@@ -1,1 +1,3 @@
-import {LitMovable} from './src/LitMovable.js';
+export {LitMovable} from './src/LitMovable.js'
+
+
