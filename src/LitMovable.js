@@ -86,6 +86,7 @@ class MoveBounds {
  * @attr {boolean} shiftBehavior - When enabled, holding the shift key will coerce movement to perpendicular coordinates only.
  * @attr {boolean} disabled - Disables movement behavior
  * @attr {boolean} eventsOnly - Only fires movement events, but will not move the element
+ * @attr {number} dragAfterDist - Number of pixels (threshold) before the first move event will fire
  *
  * @slot - default/unnamed slot
  *
@@ -430,4 +431,4 @@ export class LitMovable extends LitElement {
   }
 }
 
-window.customElements.define('lit-movable', LitMovable);
+window.customElements.get('lit-movable') || window.customElements.define('lit-movable', LitMovable);
