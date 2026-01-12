@@ -145,7 +145,7 @@ export class LitMovable extends LitElement {
   set posTop(v){
     v = Number(v);
     this._posTop = v;
-    if (this.target){
+    if (this.target && !this.eventsOnly){
       this.target.style.top = v + 'px';
     }
   }
@@ -154,7 +154,7 @@ export class LitMovable extends LitElement {
   set posLeft(v){
     v = Number(v);
     this._posLeft = v;
-    if (this.target){
+    if (this.target && !this.eventsOnly){
       this.target.style.left = v + 'px';
     }
   }
@@ -252,14 +252,14 @@ export class LitMovable extends LitElement {
     // set to true enables shift key to constrain movement to either
     // x or y axis (whichever is greater).
     // Setting any bounds option automatically disables shift key behavior.
-    shiftBehavior: { type: Boolean },
+    shiftBehavior: { type: Boolean, converter: (value) => value !== null && value !== 'false' },
 
     //disables moving
-    disabled: { type: Boolean },
+    disabled: { type: Boolean, converter: (value) => value !== null && value !== 'false' },
 
     // advanced mode: Does not move the element, but fires
     // events so you can pass to your own handler
-    eventsOnly: { type: Boolean },
+    eventsOnly: { type: Boolean, converter: (value) => value !== null && value !== 'false' },
     listening: { type: Boolean},
     onmovestart: {type: Object},
     onmoveend: {type: Object},
