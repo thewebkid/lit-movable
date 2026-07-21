@@ -14,6 +14,17 @@ const chromeCandidates = [
 
 const executablePath = chromeCandidates.find((path) => existsSync(path));
 
+// GitHub Actions / container runners often cannot use Chromium's sandbox.
+const ciArgs = process.env.CI
+  ? ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+  : [];
+
+const launchOptions = {
+  headless: 'new',
+  args: ciArgs,
+  ...(executablePath ? { executablePath } : { channel: 'chrome' }),
+};
+
 export default {
   files: 'test/**/*.test.js',
   nodeResolve: true,
@@ -21,9 +32,7 @@ export default {
   plugins: [sendMousePlugin()],
   browsers: [
     puppeteerLauncher({
-      launchOptions: executablePath
-        ? { executablePath, headless: 'new' }
-        : { channel: 'chrome', headless: 'new' },
+      launchOptions,
     }),
   ],
 };
