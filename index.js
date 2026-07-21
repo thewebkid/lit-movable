@@ -1,1 +1,1 @@
-export { LitMovable } from './dist/index.js';
+export { Movable, LitMovable } from './dist/index.js';

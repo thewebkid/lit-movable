@@ -1,3 +1,1 @@
-export {LitMovable} from './src/LitMovable.js'
-
-
+export { Movable, LitMovable } from './src/Movable.js';

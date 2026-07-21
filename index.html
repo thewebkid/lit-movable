@@ -1,59 +1,67 @@
 <!doctype html>
 <html lang="en-GB">
 <head>
-  <title>lit-movable</title>
+  <title>movable (lit-movable)</title>
   <meta charset="utf-8">
   <style>
-    html,body {
+    html, body {
       background: #fafafa;
       height: 100%;
       font-family: Arial, sans-serif;
       font-size: 18px;
     }
     div {
-      position:relative;
-      padding:8px;
+      position: relative;
+      padding: 8px;
     }
   </style>
-  <script type="module" src="./src/LitMovable.js"></script>
+  <script type="module" src="./src/Movable.js"></script>
 </head>
 <body>
-<div style="display: flex;height:250px">
-  <div style="width:33%">
-    <lit-movable>
-      <div style="background:lightsteelblue">move me anywhere</div>
-    </lit-movable>
+<div style="display: flex; height: 250px">
+  <div style="width: 33%">
+    <movable-el>
+      <div style="background: lightsteelblue">move me anywhere</div>
+    </movable-el>
   </div>
-  <div style="width:33%">
-    <lit-movable horizontal="-50,250">
-      <div style="background:lightsteelblue">Move me horizontally</div>
-    </lit-movable>
+  <div style="width: 33%">
+    <movable-el axis="x" boundsX="-50,250">
+      <div style="background: lightsteelblue">Move me horizontally</div>
+    </movable-el>
   </div>
-  <div style="width:33%">
-    <div style="height:200px;width:200px;border:solid 1px blue;" id="dialog">
-      <lit-movable targetSelector="#dialog">
-        <div style="background:lightsteelblue;width:186px">I am a draggable title</div>
-      </lit-movable>
-      I am not directly grabbable, but I will move if you grab my title.
+  <div style="width: 33%">
+    <div style="height: 200px; width: 200px; border: solid 1px blue;" id="dialog">
+      <movable-el targetSelector="#dialog">
+        <div slot="handle" style="background: lightsteelblue; width: 186px">
+          I am a draggable title
+        </div>
+      </movable-el>
+      Body text is not a handle — drag the title.
     </div>
   </div>
 </div>
-<div style="display: flex; height:50%">
-  <div style="width:33%">
-    <lit-movable grid="50" shiftBehavior="true">
-      <div style="background:lightsteelblue">my grid is 50 <br>(try holding shift while dragging)</div>
-    </lit-movable>
+<div style="display: flex; height: 50%">
+  <div style="width: 33%">
+    <movable-el grid="50" shiftBehavior>
+      <div style="background: lightsteelblue">
+        my grid is 50<br>(try holding shift while dragging)
+      </div>
+    </movable-el>
   </div>
-  <div style="width:33%">
-    <lit-movable vertical="-999,9999">
-      <div style="background:lightsteelblue">Move me vertically</div>
-    </lit-movable>
+  <div style="width: 33%">
+    <movable-el axis="y" boundsY="-999,9999">
+      <div style="background: lightsteelblue">Move me vertically</div>
+    </movable-el>
   </div>
-  <div style="width:33%;">
-    <div style="height:200px;width:200px;border:solid 1px green;position:relative">
-      <lit-movable posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
-        <div style="background:lightsteelblue;width:30px;margin-left:-15px;height:18px;margin-top:-9px">box</div>
-      </lit-movable>
+  <div style="width: 33%">
+    <div style="height: 200px; width: 200px; border: solid 1px green; position: relative">
+      <movable-el posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
+        <div
+          style="background: lightsteelblue; width: 30px; margin-left: -15px; height: 18px; margin-top: -9px"
+        >
+          box
+        </div>
+      </movable-el>
     </div>
   </div>
 </div>

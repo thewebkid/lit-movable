@@ -1,10 +1,14 @@
-# \<lit-movable> [![npm version](https://badge.fury.io/js/lit-movable.svg)](https://badge.fury.io/js/lit-movable) [![tests](https://img.shields.io/github/actions/workflow/status/thewebkid/lit-movable/test.yml?branch=master&label=tests)](https://github.com/thewebkid/lit-movable/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# \<movable-el> [![npm version](https://badge.fury.io/js/lit-movable.svg)](https://badge.fury.io/js/lit-movable) [![tests](https://img.shields.io/github/actions/workflow/status/thewebkid/lit-movable/test.yml?branch=master&label=tests)](https://github.com/thewebkid/lit-movable/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Movable element - simple and robust. A wrapper web component that can enable customizable element move operations and expose pointer state data.
+Declarative drag/move for [Lit](https://lit.dev/) and plain HTML. Wrap content in `<movable-el>`, optionally constrain axes, snap to a grid, or move a different target than the drag handle.
+
+**When to use it:** Lit / web-component apps that need lightweight pointer dragging with rich move state — without a full drag-and-drop framework.
 
 [Live Demo](http://thewebkid.com/modules/lit-movable)
 
-Since this is a [Lit 3 web component](https://lit.dev/), this will work inside any SPA framework. [React integration docs](https://lit.dev/docs/frameworks/react/). Framework-agnostic web components are the future!
+> **Peer dependency:** `lit` `^3` (not bundled).  
+> **Tags:** primary `<movable-el>`; `<lit-movable>` remains registered as a compatible alias.  
+> **TypeScript:** ships with `index.d.ts` (`Movable`, `MoveState`, tag map for both elements).
 
 ## Installation
 
@@ -12,137 +16,140 @@ Since this is a [Lit 3 web component](https://lit.dev/), this will work inside a
 npm i lit-movable
 ```
 
-## Basic Usage
+```ts
+import { Movable, type MoveState } from 'lit-movable';
+
+const el = document.querySelector('movable-el');
+el?.addEventListener('move', (e: CustomEvent<MoveState>) => {
+  console.log(e.detail.coords);
+});
+```
+
+## Basic usage
 
 ```html
 <script type="module">
-  import {LitMovable} from 'lit-movable';
+  import { Movable } from 'lit-movable';
 </script>
-<lit-movable>
+
+<movable-el>
   <div style="background:lightsteelblue">I am movable</div>
-</lit-movable>
+</movable-el>
 ```
 
+## Attributes
 
-### Attributes
-- **posTop**: _Number_ - Represents the offsetTop value (reflected). When set, will set the initial _style.top_ value. Updates with move events
-- **posLeft**: _Number_ - Represents the offsetLeft value (reflected). When set, will set the initial _style.left_ value. Updates with move events
-- **targetSelector**: _String_ - A selector to select the element that will move. Defaults to the lit-movable (this) element, but useful when for example you want to allow a modal header to respond to pointer events but you want the entire modal to move.
-- **boundsX**: _String: boundsX="min,max"_ Defaults to -Infinity,Infinity. Set to restrict movement along the x axis.
-- **boundsY**: _String: boundsY="min,max"_ Defaults to -Infinity,Infinity. Set to restrict movement along the y axis.
-- **vertical**: _String: vertical="min,max"_ - Will constrain horizontal (x) movement completely and allow vertical (y) movement between the specified values.
-- **horizontal**: _String: horizontal="min,max"_ - Will constrain vertical (y) movement completely and allow horizontal (x) movement between the specified values.
-- **grid**: _Number_ - Snaps movement to nearest grid position (defaults to 1). Initial element position represents the 0,0 position. Movement snapped to the provided value increment
-- **shiftBehavior** _Bool_ - When enabled, holding the shift key will coerce movement to perpendicular coordinates only.
-- **disabled**: _Bool_ - Disables movement behavior.
-- **eventsOnly**: _Bool_ - (advanced) Only fires movement events, but will not move the element.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `posTop` / `posLeft` | Number | Initial / reflected `top` / `left` (px) |
+| `targetSelector` | String | CSS selector for the element that moves (default: the `<movable-el>` itself) |
+| `boundsX` / `boundsY` | String | `"min,max"` relative to current position, or `"null"` to lock that axis |
+| `axis` | `"x"` \| `"y"` | Lock the other axis to the current position |
+| `grid` | Number | Snap increment in px (default `1`) |
+| `dragAfterDist` | Number | Pointer travel (px) before a drag starts (default `0`) |
+| `shiftBehavior` | Boolean | With open bounds, Shift constrains to the dominant axis |
+| `disabled` | Boolean | Disable dragging |
+| `eventsOnly` | Boolean | Fire events but do not reposition the target |
 
+## Slots
 
-## Events 
-Lit-Movable exposes events as either callback properties or the built in custom events.
+- **default** — content
+- **`handle`** — optional drag handle. When present, only that slot starts a drag
 
-### Event Properties
-- **onmovestart**: called immediately after the pointerdown event on the element
-- **onmove**: called continuously while moving
-- **onmoveend**: called after the pointerup event on the element
-
-### Custom Events
-- **movestart**: fires immediately after the pointerdown event on the element
-- **move**: fires continuously while moving
-- **moveend**: fires after the pointerup event on the element
-
-### Event binding examples
 ```html
-<lit-movable id="myMovable"></lit-movable>
-<script>
-  const movableEl = document.getElementById("myMovable");
-  /* Bind As property */
-  movableEl.onmove = (moveState)=>{
-    const {coords, clickOffset, mouseCoord, moveDist, startCoord, totalDist} = moveState;
-    //all coordinates expose x,y,top,left
-    console.log(coords);//Current element pos  
-    console.log(clickOffset);// the position of the pointer relative to the top/left of the element
-    console.log(mouseCoord); // current mouse pos on page - equivalent of pageX/pageY on a mouse event
-    console.log(moveDist); //distance moved since previous move operation
-    console.log(startCoord); //position of element on pointerdown
-    console.log(totalDist);//distance moved from pointerdown to pointerup
-  }
-  /* Custom Event */
-  movableEl.addEventListener('move', (event) => {
-    const moveState = event.detail;
-    console.log({moveState});//same state object as above
-  });
-</script>
- 
+<movable-el>
+  <div slot="handle">Drag me</div>
+  <div>I move with the handle, but I'm not grabbable</div>
+</movable-el>
 ```
 
-## More usage examples
+## Events
 
-#### Modal behavior
-Parent moves when title is dragged. Used targetSelector attribute.
+Custom events bubble and are composed. `event.detail` is a plain move-state object (not a spread PointerEvent):
+
+- `coords`, `startCoord`, `moveDist`, `totalDist`, `mouseCoord`, `clickOffset`
+- `posTop`, `posLeft`, `pctX` / `pctY` (when bounds are finite), `isMoving`
+
+Events: `movestart`, `move`, `moveend`.
+
+Callback properties `onmovestart`, `onmove`, `onmoveend` receive the same state object.
+
+```js
+const el = document.querySelector('movable-el');
+
+el.addEventListener('move', ({ detail }) => {
+  console.log(detail.coords, detail.totalDist);
+});
+
+el.onmoveend = (state) => console.log(state.posLeft, state.posTop);
+```
+
+## Examples
+
+### Move a parent (modal title)
+
 ```html
-  <div style="height:200px;width:200px;border:solid 1px blue;" id="dialog">
-    <lit-movable targetSelector="#dialog">
-      <div style="background:lightsteelblue;width:100%">I am a draggable title</div>
-    </lit-movable>
-    I am not directly grabbable, but I will move if you grab my title.
-  </div>
+<div id="dialog" style="position:absolute;width:200px;border:1px solid blue">
+  <movable-el targetSelector="#dialog">
+    <div slot="handle" style="background:lightsteelblue">Title</div>
+  </movable-el>
+  Body is not a handle.
+</div>
 ```
 
-#### Horizontal only
-Constrain vertical movement. Allow -50 -> 250 horizontal movement. Here are two ways to accomplish the identical behavior.
+### Horizontal only
+
 ```html
-    <!-- Set horizontal movement only -->
-    <lit-movable horizontal="-50,250">
-      <div style="background:lightsteelblue">Move me horizontally</div>
-    </lit-movable>
+<movable-el axis="x" boundsX="-50,250">
+  <div>Horizontal</div>
+</movable-el>
 
-  <!-- OR -->
-  <!-- Explicit x/y boundaries. Null string constrains an axis -->
-  <lit-movable boundsX="-50,250" boundsY="null">
-    <div style="background:lightsteelblue">Move me horizontally</div>
-  </lit-movable>
+<!-- equivalent -->
+<movable-el boundsX="-50,250" boundsY="null">
+  <div>Horizontal</div>
+</movable-el>
 ```
 
-#### Vertical only
-Two identical ways to constrain horizontal movement, but enable broad vertical motion. 
+### Grid + shift
+
 ```html
-  <!-- Set vertical movement only -->
-  <lit-movable vertical="-999,9999">
-    <div style="background:lightsteelblue">Move me vertically</div>
-  </lit-movable>
-  <!-- Alternate explicit bounds (x,y) equivalent. Null = no movement enabled -->
-  <lit-movable boundsY="-999,9999" boundsX="null">
-    <div style="background:lightsteelblue">Move me vertically</div>
-  </lit-movable>
+<movable-el grid="50" shiftBehavior>
+  <div>Snap 50px (hold Shift)</div>
+</movable-el>
 ```
 
-#### Snapping / shift key option enabled
-Snaps to a 50px grid with shift key behavior.
+### Constrained box
+
 ```html
-  <lit-movable grid="50" shiftBehavior="true">
-    <div style="background:lightsteelblue">my grid is 50 <br>(try holding shift while dragging)</div>
-  </lit-movable>
+<div style="position:relative;height:200px;width:200px;border:1px solid green">
+  <movable-el posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
+    <div>box</div>
+  </movable-el>
+</div>
 ```
 
-#### Constrain both directions
-Start in middle of a constrained box.
-```html
-  <div style="height:200px;width:200px;border:solid 1px green;position:relative">
-    <lit-movable posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
-      <div style="background:lightsteelblue;width:30px;margin-left:-15px;height:18px;margin-top:-9px">
-        box
-      </div>
-    </lit-movable>
-  </div>
-```
+## Migrating from 0.x
 
+| 0.x | 1.0 |
+|-----|-----|
+| `<lit-movable>` | `<movable-el>` (or keep `<lit-movable>` — still registered as an alias) |
+| `import { LitMovable }` | `import { Movable }` (`LitMovable` still exported as the alias class) |
+| `horizontal="min,max"` | `axis="x"` + `boundsX="min,max"` |
+| `vertical="min,max"` | `axis="y"` + `boundsY="min,max"` |
+| event `detail` mixed with PointerEvent | plain move-state only |
 
-## Run local
-Uses vite. Will run on node 16+ but will complain about compatibility if you are stuck on node 16 like me. Ignore this. It's fine.
+npm package name remains **`lit-movable`**.
+
+## Local development
+
 ```bash
 git clone https://github.com/thewebkid/lit-movable.git
-cd ./lit-movable
+cd lit-movable
 npm i
 npm run dev
+```
+
+```bash
+npm test
+npm run build
 ```
