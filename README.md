@@ -1,4 +1,4 @@
-# \<lit-movable> [![npm version](https://badge.fury.io/js/lit-movable.svg)](https://badge.fury.io/js/lit-movable) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# \<lit-movable> [![npm version](https://badge.fury.io/js/lit-movable.svg)](https://badge.fury.io/js/lit-movable) [![tests](https://img.shields.io/github/actions/workflow/status/thewebkid/lit-movable/test.yml?branch=master&label=tests)](https://github.com/thewebkid/lit-movable/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Movable element - simple and robust. A wrapper web component that can enable customizable element move operations and expose pointer state data.
 
@@ -25,15 +25,15 @@ npm i lit-movable
 
 
 ### Attributes
-- **posTop**: _Number_ - Represents the offsetTop/Left value (reflected). When set, will set the initial _style.top_ value. Updates with move events
-- **posTop**: _Number_ - Represents the offsetLeft value (reflected). When set, will set the initial style.top value. Updates with move events
+- **posTop**: _Number_ - Represents the offsetTop value (reflected). When set, will set the initial _style.top_ value. Updates with move events
+- **posLeft**: _Number_ - Represents the offsetLeft value (reflected). When set, will set the initial _style.left_ value. Updates with move events
 - **targetSelector**: _String_ - A selector to select the element that will move. Defaults to the lit-movable (this) element, but useful when for example you want to allow a modal header to respond to pointer events but you want the entire modal to move.
 - **boundsX**: _String: boundsX="min,max"_ Defaults to -Infinity,Infinity. Set to restrict movement along the x axis.
 - **boundsY**: _String: boundsY="min,max"_ Defaults to -Infinity,Infinity. Set to restrict movement along the y axis.
 - **vertical**: _String: vertical="min,max"_ - Will constrain horizontal (x) movement completely and allow vertical (y) movement between the specified values.
 - **horizontal**: _String: horizontal="min,max"_ - Will constrain vertical (y) movement completely and allow horizontal (x) movement between the specified values.
 - **grid**: _Number_ - Snaps movement to nearest grid position (defaults to 1). Initial element position represents the 0,0 position. Movement snapped to the provided value increment
-- **shiftKey** _Bool_ - When enabled, holding the shift key will coerce movement to perpendicular coordinates only.
+- **shiftBehavior** _Bool_ - When enabled, holding the shift key will coerce movement to perpendicular coordinates only.
 - **disabled**: _Bool_ - Disables movement behavior.
 - **eventsOnly**: _Bool_ - (advanced) Only fires movement events, but will not move the element.
 
@@ -113,7 +113,7 @@ Two identical ways to constrain horizontal movement, but enable broad vertical m
   </lit-movable>
   <!-- Alternate explicit bounds (x,y) equivalent. Null = no movement enabled -->
   <lit-movable boundsY="-999,9999" boundsX="null">
-    <div style="background:lightsteelblue">Move me horizontally</div>
+    <div style="background:lightsteelblue">Move me vertically</div>
   </lit-movable>
 ```
 
@@ -144,5 +144,5 @@ Uses vite. Will run on node 16+ but will complain about compatibility if you are
 git clone https://github.com/thewebkid/lit-movable.git
 cd ./lit-movable
 npm i
-npm dev
+npm run dev
 ```

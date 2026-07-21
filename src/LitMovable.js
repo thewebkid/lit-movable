@@ -64,8 +64,9 @@ class MoveBounds {
     if (!s){
       return new MoveBounds();
     }
+    // Lock this axis to the current position (no movement), not document 0.
     if (s === 'null'){
-      return new MoveBounds(0, 0);
+      return new MoveBounds(offset, offset);
     }
     let [min, max] = s.split(',').map(n => Number(n.trim()) + offset);
     let bounds = new MoveBounds(min, max);
@@ -203,7 +204,6 @@ export class LitMovable extends LitElement {
 
   set boundsX(v) {
     this._boundsX = MoveBounds.fromString(v, pxVal(this.target?.style.left ?? 0));
-    this.bounds.left = this._boundsX;
   }
 
   get boundsY() {
@@ -212,8 +212,6 @@ export class LitMovable extends LitElement {
 
   set boundsY(v) {
     this._boundsY = MoveBounds.fromString(v, pxVal(this.target?.style.top ?? 0));
-    //let offsetTop =
-    this.bounds.top = this._boundsY;
   }
 
   static styles = css`
@@ -291,23 +289,34 @@ export class LitMovable extends LitElement {
     this.style.touchAction = 'none';
     target.style.touchAction = 'none';
 
-    if (posLeft){
-      target.style.left = posLeft + 'px';
+    if (posLeft != null){
+      target.style.left = Number(posLeft) + 'px';
     }
     else if (!left && offsetLeft){
       target.style.left = offsetLeft + 'px';
-      if (bounds.left.constrained){
-        bounds.left.min = bounds.left.max = offsetLeft;
-      }
     }
-    if (posTop){
-      target.style.top = posTop + 'px';
+    if (posTop != null){
+      target.style.top = Number(posTop) + 'px';
     }
     else if (!top && offsetTop){
       target.style.top = offsetTop + 'px';
-      if (bounds.top.constrained){
-        bounds.top.min = bounds.top.max = offsetTop;
-      }
+    }
+
+    // Axis locks (`null` / horizontal|vertical) must pin to the resolved position,
+    // regardless of attribute order vs posTop/posLeft.
+    this.syncConstrainedBounds();
+  }
+
+  /** Pin constrained axes to the target's current left/top. */
+  syncConstrainedBounds() {
+    const { bounds, target } = this;
+    const left = pxVal(target.style.left ?? 0);
+    const top = pxVal(target.style.top ?? 0);
+    if (bounds.left.constrained) {
+      bounds.left.min = bounds.left.max = left;
+    }
+    if (bounds.top.constrained) {
+      bounds.top.min = bounds.top.max = top;
     }
   }
 
@@ -429,7 +438,11 @@ export class LitMovable extends LitElement {
       this.pointerId = event.pointerId;
       // Capture on this element so pointer events keep flowing even if the
       // finger leaves the hit target (required for reliable touch dragging).
-      this.setPointerCapture(event.pointerId);
+      try {
+        this.setPointerCapture(event.pointerId);
+      } catch (_) {
+        // Synthetic PointerEvents are not active pointers; real input is fine.
+      }
     }
 
     if (!this.listening){
