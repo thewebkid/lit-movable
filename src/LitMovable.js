@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, css } from 'lit';
 
 const pxVal = v => isFinite(v) ? Number(v) : Number(v.replace(/[^0-9.\-]/g, ''));
 
@@ -216,6 +216,14 @@ export class LitMovable extends LitElement {
     this.bounds.top = this._boundsY;
   }
 
+  static styles = css`
+    :host {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  `;
+
   static properties = {
     //set the left/top position
     // defaults to  element.offsetTop /offsetLeft
@@ -279,6 +287,9 @@ export class LitMovable extends LitElement {
 
     target.style.position = 'absolute';
     target.style.cursor = 'pointer';
+    // Prevent the browser from hijacking the gesture as a pan/scroll after touch-slop (~10px).
+    this.style.touchAction = 'none';
+    target.style.touchAction = 'none';
 
     if (posLeft){
       target.style.left = posLeft + 'px';
@@ -346,15 +357,21 @@ export class LitMovable extends LitElement {
     }
   }
   unbind(event){
+    const pointerId = this.pointerId;
     this.pointerId = null;
-    document.body.removeEventListener('pointermove', (e) => this.motionHandler(e));
+    if (pointerId != null) {
+      try {
+        if (this.hasPointerCapture(pointerId)) {
+          this.releasePointerCapture(pointerId);
+        }
+      } catch (_) { /* already released */ }
+    }
     this.moveEnd(event);
   }
 
   moveEnd(event){
 
     if (this.isMoving) {
-      //document.body.removeEventListener('pointerup', ()=>this.unbind);
       this.isMoving = this.moveState.isMoving = false;
       this.reposition(false);
       this.eventBroker('moveend', event);
@@ -402,25 +419,34 @@ export class LitMovable extends LitElement {
     this.eventBroker('move', event);
   }
   pointerdown(event){
+    if (this.disabled) {
+      return;
+    }
 
-    document.body.setPointerCapture(event.pointerId);
     event.preventDefault();
     event.stopPropagation();
     if (event.pointerId !== undefined) {
       this.pointerId = event.pointerId;
+      // Capture on this element so pointer events keep flowing even if the
+      // finger leaves the hit target (required for reliable touch dragging).
+      this.setPointerCapture(event.pointerId);
     }
 
     if (!this.listening){
-      document.body.addEventListener('pointerup', event => {
+      // pointercancel fires when the browser aborts the gesture (e.g. scroll takeover)
+      const end = (event) => {
         if (this.isMoving) {
-          this.unbind(event)
+          this.unbind(event);
         }
-      }, false);
-      document.body.addEventListener('pointermove', event => {
+      };
+      this.addEventListener('pointerup', end);
+      this.addEventListener('pointercancel', end);
+      this.addEventListener('lostpointercapture', end);
+      this.addEventListener('pointermove', (event) => {
         if (this.pointerId !== undefined && event.pointerId === this.pointerId) {
           this.motionHandler(event);
         }
-      }, false);
+      });
     }
     this.listening = true;
     this.moveInit(event);
