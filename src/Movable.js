@@ -69,6 +69,8 @@ class MoveBounds {
     if (s === 'null') {
       return new MoveBounds(offset, offset);
     }
+    // IMPORTANT: min/max are deltas from `offset` (current style.left/top),
+    // not absolute coordinates. "0,160" at left=85 → absolute [85, 245].
     const [min, max] = s.split(',').map((n) => Number(n.trim()) + offset);
     const bounds = new MoveBounds(min, max);
     bounds.attr = s;
@@ -77,11 +79,11 @@ class MoveBounds {
 }
 
 /**
- * @attr {number} posTop - Initial / reflected style.top (px)
- * @attr {number} posLeft - Initial / reflected style.left (px)
+ * @attr {number} posTop - Initial / reflected style.top (px). When updating with bounds, set pos* before bounds*.
+ * @attr {number} posLeft - Initial / reflected style.left (px). When updating with bounds, set pos* before bounds*.
  * @attr {string} targetSelector - Selector for the element that moves (defaults to this)
- * @attr {string} boundsX - "min,max" relative to current left, or "null" to lock X
- * @attr {string} boundsY - "min,max" relative to current top, or "null" to lock Y
+ * @attr {string} boundsX - Relative "min,max" **offsets from current left** (not absolute coords). `"0,160"` at left=85 → absolute [85,245]. To clamp to [0,size] use `${-left},${size-left}`. `"null"` locks X. Do not reassign on every move event — reparse mid-drag corrupts the clamp; sync on movestart/moveend.
+ * @attr {string} boundsY - Relative "min,max" **offsets from current top** (not absolute coords). Same rules as boundsX.
  * @attr {string} axis - "x" or "y" to lock the other axis to the current position
  * @attr {number} grid - Snap increment in px (default 1)
  * @attr {boolean} shiftBehavior - Shift key constrains to the dominant axis when bounds are open
@@ -93,7 +95,7 @@ class MoveBounds {
  * @slot handle - Optional drag handle; when present, only this slot starts a drag
  *
  * @prop {Element} target - Element that moves
- * @prop {object} bounds - Runtime { left: MoveBounds, top: MoveBounds }
+ * @prop {object} bounds - Runtime { left: MoveBounds, top: MoveBounds } with **absolute** min/max after parse
  *
  * @event {CustomEvent} movestart - detail is move state (after dragAfterDist)
  * @event {CustomEvent} move - detail is move state
@@ -203,6 +205,11 @@ export class Movable extends LitElement {
   get boundsX() {
     return this._boundsX;
   }
+  /**
+   * @param {string | null} v Relative `"min,max"` from current left, or `"null"` to lock.
+   * Reparse uses `target.style.left` as offset — set `posLeft` first when both change.
+   * Avoid reassigning on every `move`; prefer movestart/moveend (see README).
+   */
   set boundsX(v) {
     this._boundsXAttr = v;
     this._boundsX = MoveBounds.fromString(v, pxVal(this.target?.style.left ?? 0));
@@ -211,6 +218,10 @@ export class Movable extends LitElement {
   get boundsY() {
     return this._boundsY;
   }
+  /**
+   * @param {string | null} v Relative `"min,max"` from current top, or `"null"` to lock.
+   * Reparse uses `target.style.top` as offset — set `posTop` first when both change.
+   */
   set boundsY(v) {
     this._boundsYAttr = v;
     this._boundsY = MoveBounds.fromString(v, pxVal(this.target?.style.top ?? 0));

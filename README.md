@@ -41,15 +41,56 @@ el?.addEventListener('move', (e: CustomEvent<MoveState>) => {
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| `posTop` / `posLeft` | Number | Initial / reflected `top` / `left` (px) |
+| `posTop` / `posLeft` | Number | Initial / reflected `top` / `left` (px). Set these **before** `boundsX` / `boundsY` when both change in one update |
 | `targetSelector` | String | CSS selector for the element that moves (default: the `<movable-el>` itself) |
-| `boundsX` / `boundsY` | String | `"min,max"` relative to current position, or `"null"` to lock that axis |
+| `boundsX` / `boundsY` | String | **Relative** `"min,max"` offsets from the *current* `left` / `top` (not document coords). `"null"` locks that axis |
 | `axis` | `"x"` \| `"y"` | Lock the other axis to the current position |
 | `grid` | Number | Snap increment in px (default `1`) |
 | `dragAfterDist` | Number | Pointer travel (px) before a drag starts (default `0`) |
 | `shiftBehavior` | Boolean | With open bounds, Shift constrains to the dominant axis |
 | `disabled` | Boolean | Disable dragging |
 | `eventsOnly` | Boolean | Fire events but do not reposition the target |
+
+## Bounds mental model (read this)
+
+`boundsX` / `boundsY` are **not** absolute `style.left` / `style.top` ranges.
+
+They are **deltas from the element’s current position** at the moment the attribute/property is applied:
+
+```text
+absoluteMin = currentLeft + min
+absoluteMax = currentLeft + max
+```
+
+So if the knob is already at `left: 85` and you want it clamped to the box `[0, 160]`:
+
+```html
+<!-- WRONG — looks absolute, parses as [85, 245] -->
+<movable-el posLeft="85" boundsX="0,160"></movable-el>
+
+<!-- RIGHT — deltas from 85 → absolute [0, 160] -->
+<movable-el posLeft="85" boundsX="-85,75"></movable-el>
+```
+
+General recipe for “stay inside `[0, size]`” while the control is at `(left, top)`:
+
+```js
+boundsX = `${-left}, ${size - left}`;
+boundsY = `${-top}, ${size - top}`;
+```
+
+### Lit / reactive gotchas
+
+1. **Set `posLeft` / `posTop` before `boundsX` / `boundsY`** in the same render. Bounds reparse against *current* `style.left` / `top`. If bounds land first, the offset is stale and the clamp drifts.
+2. **Do not rewrite bounds on every `move` event.** The resolved `[min, max]` is already absolute after the first parse. Re-applying a new relative string mid-drag (while `style.left` has moved but your bound `pos*` lags) widens or shifts the clamp — knobs escape the box, saturation goes negative, etc. Sync bounds on `movestart` / `moveend` (or whenever you intentionally reposition outside a gesture), and only update `pos*` during `move`.
+3. **`"null"` locks an axis** to the current coordinate (no movement on that axis), not “no bounds”.
+
+```html
+<!-- Horizontal slider: free X in a band, Y locked -->
+<movable-el posLeft="40" axis="x" boundsX="-40,200">
+  <a class="thumb"></a>
+</movable-el>
+```
 
 ## Slots
 
@@ -120,12 +161,37 @@ el.onmoveend = (state) => console.log(state.posLeft, state.posTop);
 
 ### Constrained box
 
+Clamped to a 200×200 parent. Note the **relative** bounds: at `(100,100)`, `"-100,100"` → absolute `[0,200]`.
+
 ```html
 <div style="position:relative;height:200px;width:200px;border:1px solid green">
   <movable-el posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
     <div>box</div>
   </movable-el>
 </div>
+```
+
+### Reactive knob (color picker pattern)
+
+Keep the sample point on-canvas; allow the thumb to half-overhang. Freeze bounds during the gesture:
+
+```js
+// size = canvas CSS px; left/top = sample point
+const boundsX = `${-left}, ${size - left}`;
+const boundsY = `${-top}, ${size - top}`;
+
+html`
+  <movable-el
+    .posTop=${top}
+    .posLeft=${left}
+    .boundsX=${dragging ? frozenBoundsX : boundsX}
+    .boundsY=${dragging ? frozenBoundsY : boundsY}
+    @movestart=${() => { dragging = true; freezeBounds(); }}
+    @move=${onMove}
+    @moveend=${() => { dragging = false; }}>
+    <div class="circle"></div>
+  </movable-el>
+`;
 ```
 
 ## Migrating from 0.x

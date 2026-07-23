@@ -61,15 +61,19 @@ export declare class Movable extends LitElement {
 
   /**
    * Bounds for the X axis.
-   * Set with `"min,max"` (relative to current left) or `"null"` to lock.
-   * Reading returns the resolved {@link MoveBounds}.
+   * Set with `"min,max"` as **offsets from the current left** (not absolute coords),
+   * or `"null"` to lock. Example: at `posLeft=85`, use `"-85,75"` to clamp to `[0,160]`.
+   * Set `posLeft` before `boundsX` when both change. Do not reassign on every `move`
+   * event — reparse mid-drag corrupts the clamp; sync on `movestart` / `moveend`.
+   * Reading returns the resolved {@link MoveBounds} (absolute min/max).
    */
   boundsX: string | MoveBounds | null;
 
   /**
    * Bounds for the Y axis.
-   * Set with `"min,max"` (relative to current top) or `"null"` to lock.
-   * Reading returns the resolved {@link MoveBounds}.
+   * Set with `"min,max"` as **offsets from the current top** (not absolute coords),
+   * or `"null"` to lock. Same ordering / mid-drag rules as {@link Movable.boundsX}.
+   * Reading returns the resolved {@link MoveBounds} (absolute min/max).
    */
   boundsY: string | MoveBounds | null;
 
