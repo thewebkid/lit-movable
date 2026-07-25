@@ -1,69 +1,489 @@
 <!doctype html>
 <html lang="en-GB">
 <head>
-  <title>movable (lit-movable)</title>
+  <title>lit-movable — declarative drag for Lit &amp; plain HTML</title>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Declarative drag/move for Lit and plain HTML. Wrap content in <movable-el>, constrain axes, snap to a grid, or move a different target than the drag handle.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      background: #fafafa;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      font-size: 18px;
+    :root {
+      --bg: #0d1117;
+      --bg-soft: #131a24;
+      --panel: #161d2b;
+      --panel-border: #2a3548;
+      --text: #e6edf3;
+      --text-dim: #8b98ab;
+      --accent: #7c6cff;
+      --accent-2: #4cc2ff;
+      --ok: #3fb950;
+      --warn: #d29922;
+      --pink: #f778ba;
+      --chip-bg: rgba(124, 108, 255, 0.14);
+      --code-bg: #0a0e14;
+      --radius: 14px;
     }
-    div {
-      position: relative;
-      padding: 8px;
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      background:
+        radial-gradient(1000px 500px at 85% -10%, rgba(124, 108, 255, 0.18), transparent 60%),
+        radial-gradient(800px 400px at -10% 0%, rgba(76, 194, 255, 0.12), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---------- layout ---------- */
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px 96px; }
+
+    /* ---------- header ---------- */
+    header.hero { padding: 72px 0 40px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--accent-2); background: rgba(76, 194, 255, 0.1);
+      border: 1px solid rgba(76, 194, 255, 0.25);
+      padding: 5px 12px; border-radius: 999px; margin-bottom: 20px;
+    }
+    h1 {
+      font-size: clamp(34px, 5vw, 52px); font-weight: 800; letter-spacing: -0.03em;
+      margin: 0 0 14px; line-height: 1.05;
+    }
+    h1 .grad {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .lede { font-size: 17px; color: var(--text-dim); max-width: 640px; margin: 0 0 26px; }
+    .lede code { font-family: 'JetBrains Mono', monospace; font-size: 0.86em; color: var(--accent-2); background: rgba(76,194,255,.08); padding: 1px 6px; border-radius: 6px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 600; font-size: 14px; text-decoration: none;
+      padding: 10px 18px; border-radius: 10px; transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(90deg, var(--accent), #5e8bff); color: #fff; box-shadow: 0 6px 20px rgba(124, 108, 255, 0.35); }
+    .btn-ghost { color: var(--text); border: 1px solid var(--panel-border); background: var(--panel); }
+    .install {
+      font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+      background: var(--code-bg); border: 1px solid var(--panel-border);
+      padding: 10px 16px; border-radius: 10px; color: var(--ok);
+    }
+
+    /* ---------- section headings ---------- */
+    .section-head { margin: 56px 0 22px; }
+    .section-head h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
+    .section-head p { color: var(--text-dim); margin: 0; max-width: 640px; }
+
+    /* ---------- demo grid ---------- */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+    .card {
+      background: linear-gradient(180deg, var(--bg-soft), var(--panel));
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      overflow: hidden; display: flex; flex-direction: column;
+      transition: border-color .2s ease, transform .2s ease;
+    }
+    .card:hover { border-color: #3b4a66; transform: translateY(-2px); }
+    .card-head { padding: 18px 20px 0; }
+    .chip {
+      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--accent); background: var(--chip-bg); border-radius: 6px; padding: 3px 9px; margin-bottom: 10px;
+    }
+    .card-head h3 { margin: 0 0 6px; font-size: 16.5px; font-weight: 700; letter-spacing: -0.01em; }
+    .card-head p { margin: 0 0 14px; color: var(--text-dim); font-size: 13.5px; }
+    .card-head p code { font-family: 'JetBrains Mono', monospace; font-size: .85em; color: var(--accent-2); }
+
+    .stage {
+      position: relative; margin: 0 20px; height: 220px; border-radius: 10px;
+      background:
+        linear-gradient(rgba(139, 152, 171, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 152, 171, 0.07) 1px, transparent 1px),
+        rgba(10, 14, 20, 0.55);
+      background-size: 25px 25px;
+      border: 1px dashed #2e3a4f;
+      overflow: hidden;
+    }
+    .stage-label {
+      position: absolute; top: 8px; left: 10px; font-size: 10.5px; font-weight: 600;
+      letter-spacing: .05em; text-transform: uppercase; color: #54637a; pointer-events: none; z-index: 0;
+    }
+
+    /* draggable boxes */
+    .box {
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      color: #10141c; cursor: grab; user-select: none; touch-action: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      transition: box-shadow .15s ease;
+    }
+    .box:active { cursor: grabbing; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
+    .box small { display: block; font-weight: 500; opacity: .75; font-size: 11px; }
+    .b-blue { background: linear-gradient(135deg, #79b8ff, #4cc2ff); }
+    .b-purple { background: linear-gradient(135deg, #b3a1ff, #7c6cff); color: #fff; }
+    .b-green { background: linear-gradient(135deg, #7ee2a8, #3fb950); }
+    .b-pink { background: linear-gradient(135deg, #ffb3d9, #f778ba); }
+    .b-amber { background: linear-gradient(135deg, #ffd883, #d29922);width:60px; }
+    .b-red { background: linear-gradient(135deg, #ffa198, #f85149); color: #fff; }
+
+    /* dialog demo */
+    .demo-dialog {
+      position: absolute; top: 24px; left: 24px; width: 210px;
+      background: #1b2331; border: 1px solid #3b4a66; border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45); overflow: hidden; font-size: 12.5px;
+    }
+    .demo-dialog .titlebar {
+      display: flex; align-items: center; gap: 8px; cursor: grab; user-select: none; touch-action: none;
+      background: linear-gradient(135deg, #2c3a56, #232f47); padding: 9px 12px;
+      font-weight: 700; font-size: 12.5px; color: var(--text);
+    }
+    .demo-dialog .titlebar:active { cursor: grabbing; }
+    .demo-dialog .dots { display: flex; gap: 4px; }
+    .demo-dialog .dots i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+    .demo-dialog .body { padding: 10px 12px; color: var(--text-dim); }
+
+    /* constrained box demo */
+    .arena {
+      position: absolute; inset: 22px; border: 1px solid rgba(63, 185, 80, 0.5);
+      border-radius: 8px; background: rgba(63, 185, 80, 0.05);
+    }
+    .knob {
+      width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
+      background: radial-gradient(circle at 32% 30%, #8df0b3, #3fb950);
+      box-shadow: 0 4px 14px rgba(63, 185, 80, 0.45), inset 0 0 0 2px rgba(255,255,255,.25);
+      cursor: grab; touch-action: none;
+    }
+    .knob:active { cursor: grabbing; }
+
+    /* events demo */
+    .event-readout {
+      position: absolute; left: 10px; bottom: 8px; right: 10px; z-index: 0;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #54637a;
+      display: flex; gap: 14px; pointer-events: none; white-space: nowrap; overflow: hidden;
+    }
+    .event-readout b { color: var(--accent-2); font-weight: 500; }
+    .event-readout .live { color: var(--ok); }
+
+    /* ---------- code blocks ---------- */
+    .code {
+      margin: 16px 0 0; background: var(--code-bg); border-top: 1px solid var(--panel-border);
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.65;
+      overflow-x: auto; flex: 1;
+    }
+    .code pre { margin: 0; padding: 14px 18px 16px; }
+    .tok-tag { color: #ff7b72; }
+    .tok-attr { color: #79c0ff; }
+    .tok-str { color: #a5d6ff; }
+    .tok-com { color: #7d8590; font-style: italic; }
+    .tok-kw { color: #ff7b72; }
+    .tok-fn { color: #d2a8ff; }
+    .tok-num { color: #79c0ff; }
+
+    /* ---------- attribute table ---------- */
+    .table-card {
+      background: linear-gradient(180deg, var(--bg-soft), var(--panel));
+      border: 1px solid var(--panel-border); border-radius: var(--radius); overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 640px; }
+    th, td { text-align: left; padding: 11px 18px; border-bottom: 1px solid rgba(42, 53, 72, 0.6); vertical-align: top; }
+    th { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-dim); font-weight: 700; }
+    tr:last-child td { border-bottom: none; }
+    td code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-2); background: rgba(76,194,255,.08); padding: 1px 6px; border-radius: 5px; white-space: nowrap; }
+    td { color: #c4cfdd; }
+
+    footer { margin-top: 72px; padding-top: 24px; border-top: 1px solid var(--panel-border); color: var(--text-dim); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    footer a { color: var(--accent-2); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+      header.hero { padding: 48px 0 28px; }
+      .stage { height: 200px; }
     }
   </style>
   <script type="module" src="./src/Movable.js"></script>
 </head>
 <body>
-<div style="display: flex; height: 250px">
-  <div style="width: 33%">
-    <movable-el>
-      <div style="background: lightsteelblue">move me anywhere</div>
-    </movable-el>
-  </div>
-  <div style="width: 33%">
-    <movable-el axis="x" boundsX="-50,250">
-      <div style="background: lightsteelblue">Move me horizontally</div>
-    </movable-el>
-  </div>
-  <div style="width: 33%">
-    <div style="height: 200px; width: 200px; border: solid 1px blue;" id="dialog">
-      <movable-el targetSelector="#dialog">
-        <div slot="handle" style="background: lightsteelblue; width: 186px">
-          I am a draggable title
-        </div>
-      </movable-el>
-      Body text is not a handle — drag the title.
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">◈ Lit web component</span>
+    <h1>Drag anything, <span class="grad">declaratively</span>.</h1>
+    <p class="lede">
+      <code>&lt;movable-el&gt;</code> is a tiny wrapper that makes any element draggable — no framework,
+      no drag-and-drop boilerplate. Constrain axes, snap to a grid, clamp to bounds, or drag a whole
+      dialog by its title bar. Every demo below is live — grab a box and the code that built it.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/thewebkid/lit-movable" target="_blank" rel="noopener">★ GitHub</a>
+      <a class="btn btn-ghost" href="https://www.npmjs.com/package/lit-movable" target="_blank" rel="noopener">npm package</a>
+      <span class="install">npm i lit-movable</span>
     </div>
+  </header>
+
+  <div class="section-head">
+    <h2>Playground</h2>
+    <p>Six live demos covering the core API. Each card shows the exact markup that renders it.</p>
   </div>
-</div>
-<div style="display: flex; height: 50%">
-  <div style="width: 33%">
-    <movable-el grid="50" shiftBehavior>
-      <div style="background: lightsteelblue">
-        my grid is 50<br>(try holding shift while dragging)
+
+  <div class="grid">
+
+    <!-- 1 · Free movement -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">Basics</span>
+        <h3>Free movement</h3>
+        <p>Drop any content inside <code>&lt;movable-el&gt;</code> and it becomes draggable. Zero configuration.</p>
       </div>
-    </movable-el>
-  </div>
-  <div style="width: 33%">
-    <movable-el axis="y" boundsY="-999,9999">
-      <div style="background: lightsteelblue">Move me vertically</div>
-    </movable-el>
-  </div>
-  <div style="width: 33%">
-    <div style="height: 200px; width: 200px; border: solid 1px green; position: relative">
-      <movable-el posTop="100" posLeft="100" boundsX="-100,100" boundsY="-100,100">
-        <div
-          style="background: lightsteelblue; width: 30px; margin-left: -15px; height: 18px; margin-top: -9px"
-        >
-          box
+      <div class="stage">
+        <span class="stage-label">live demo</span>
+        <movable-el posTop="90" posLeft="120">
+          <div class="box b-blue">✥</div>
+        </movable-el>
+      </div>
+      <div class="code"><pre><span class="tok-tag">&lt;movable-el posTop="90" posLeft="120"&gt;</span>
+  <span class="tok-tag">&lt;div&gt;</span>✥<span class="tok-tag">&lt;/div&gt;</span>
+<span class="tok-tag">&lt;/movable-el&gt;</span></pre></div>
+    </section>
+
+    <!-- 2 · Horizontal axis -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">Axis lock</span>
+        <h3>Horizontal only</h3>
+        <p><code>axis="x"</code> locks the vertical position. <code>boundsX="-50,250"</code> clamps travel, relative to the start point.</p>
+      </div>
+      <div class="stage">
+        <span class="stage-label">live demo</span>
+        <movable-el axis="x" boundsX="-150,150" posTop="90" posLeft="120">
+          <div class="box b-purple">⇄</div>
+        </movable-el>
+      </div>
+      <div class="code"><pre><span class="tok-tag">&lt;movable-el</span> <span class="tok-attr">axis</span>=<span class="tok-str">"x"</span> <span class="tok-attr">boundsX</span>=<span class="tok-str">"-150,150"</span><span class="tok-tag">&gt;</span>
+  <span class="tok-tag">&lt;div&gt;</span><span class="tok-tag">&lt;/div&gt;</span>
+<span class="tok-tag">&lt;/movable-el&gt;</span></pre></div>
+    </section>
+
+    <!-- 3 · Vertical axis -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">Axis lock</span>
+        <h3>Vertical only</h3>
+        <p>The same trick with <code>axis="y"</code> — handy for vertical sliders and splitter controls.</p>
+      </div>
+      <div class="stage">
+        <span class="stage-label">live demo</span>
+        <movable-el axis="y" boundsY="-999,9999" posTop="90" posLeft="120">
+          <div class="box b-pink">⇅</div>
+        </movable-el>
+      </div>
+      <div class="code"><pre><span class="tok-tag">&lt;movable-el</span> <span class="tok-attr">axis</span>=<span class="tok-str">"y"</span> <span class="tok-attr">boundsY</span>=<span class="tok-str">"-999,9999"</span><span class="tok-tag">&gt;</span>
+  <span class="tok-tag">&lt;div&gt;</span><span class="tok-tag">&lt;/div&gt;</span>
+<span class="tok-tag">&lt;/movable-el&gt;</span></pre></div>
+    </section>
+
+    <!-- 4 · Grid snap -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">Snapping</span>
+        <h3>50px grid + Shift</h3>
+        <p><code>grid="50"</code> snaps each step. Hold <strong>Shift</strong> while dragging to constrain to the dominant axis.</p>
+      </div>
+      <div class="stage">
+        <span class="stage-label">live demo · watch the 25px gridlines</span>
+        <movable-el grid="50" shiftBehavior  posTop="90" posLeft="100">
+          <div class="box b-amber">snap!</div>
+        </movable-el>
+      </div>
+      <div class="code"><pre><span class="tok-tag">&lt;movable-el</span> <span class="tok-attr">grid</span>=<span class="tok-str">"50"</span> <span class="tok-attr">shiftBehavior</span><span class="tok-tag">&gt;</span>
+  <span class="tok-tag">&lt;div&gt;</span>snap! 50px grid<span class="tok-tag">&lt;/div&gt;</span>
+<span class="tok-tag">&lt;/movable-el&gt;</span></pre></div>
+    </section>
+
+    <!-- 5 · Dialog / handle slot -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">Handles &amp; targets</span>
+        <h3>Drag a dialog by its title</h3>
+        <p>The <code>handle</code> slot is the only grabbable part, and <code>targetSelector</code> moves an outer element — the classic modal pattern.</p>
+      </div>
+      <div class="stage">
+        <span class="stage-label">live demo</span>
+        <div class="demo-dialog" id="demoDialog">
+          <movable-el targetSelector="#demoDialog">
+            <div slot="handle" class="titlebar">
+              <span class="dots">
+                <i style="background:#f85149"></i><i style="background:#d29922"></i><i style="background:#3fb950"></i>
+              </span>
+              drag this title bar
+            </div>
+          </movable-el>
+          <div class="body">This body text is <em>not</em> a handle — only the title bar starts a drag.</div>
         </div>
-      </movable-el>
-    </div>
+      </div>
+      <div class="code"><pre><span class="tok-tag">&lt;div</span> <span class="tok-attr">id</span>=<span class="tok-str">"dialog"</span><span class="tok-tag">&gt;</span>
+  <span class="tok-tag">&lt;movable-el</span> <span class="tok-attr">targetSelector</span>=<span class="tok-str">"#dialog"</span><span class="tok-tag">&gt;</span>
+    <span class="tok-tag">&lt;div</span> <span class="tok-attr">slot</span>=<span class="tok-str">"handle"</span><span class="tok-tag">&gt;</span>Title<span class="tok-tag">&lt;/div&gt;</span>
+  <span class="tok-tag">&lt;/movable-el&gt;</span>
+  Body is not a handle.
+<span class="tok-tag">&lt;/div&gt;</span></pre></div>
+    </section>
+
+    <!-- 6 · Constrained box -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">Bounds</span>
+        <h3>Clamped to a box</h3>
+        <p>Bounds are <em>deltas from the current position</em>: at <code>(100,100)</code>, <code>"-100,100"</code> means absolute <code>[0,200]</code>. The knob can't escape the green arena.</p>
+      </div>
+      <div class="stage">
+        <span class="stage-label">live demo</span>
+        <div class="arena">
+          <movable-el posTop="88" posLeft="140" boundsX="-100,100" boundsY="-88,88">
+            <div class="knob"></div>
+          </movable-el>
+        </div>
+      </div>
+      <div class="code"><pre><span class="tok-com">&lt;!-- relative bounds: pos ± 100 → [0, 200] --&gt;</span>
+<span class="tok-tag">&lt;div</span> <span class="tok-attr">style</span>=<span class="tok-str">"position:relative"</span><span class="tok-tag">&gt;</span>
+  <span class="tok-tag">&lt;movable-el</span> <span class="tok-attr">posTop</span>=<span class="tok-str">"100"</span> <span class="tok-attr">posLeft</span>=<span class="tok-str">"100"</span>
+    <span class="tok-attr">boundsX</span>=<span class="tok-str">"-100,100"</span> <span class="tok-attr">boundsY</span>=<span class="tok-str">"-100,100"</span><span class="tok-tag">&gt;</span>
+    <span class="tok-tag">&lt;div</span> <span class="tok-attr">class</span>=<span class="tok-str">"knob"</span><span class="tok-tag">&gt;&lt;/div&gt;</span>
+  <span class="tok-tag">&lt;/movable-el&gt;</span>
+<span class="tok-tag">&lt;/div&gt;</span></pre></div>
+    </section>
+
+    <!-- 7 · Events -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">Events</span>
+        <h3>Live move state</h3>
+        <p><code>movestart</code> / <code>move</code> / <code>moveend</code> fire with a rich state object — <code>coords</code>, <code>totalDist</code>, <code>pctX</code>/<code>pctY</code> and more.</p>
+      </div>
+      <div class="stage">
+        <span class="stage-label">live demo · drag the box</span>
+        <movable-el id="eventsDemo">
+          <div class="box b-red">watch my events ↓</div>
+        </movable-el>
+        <div class="event-readout" id="eventReadout">
+          <span>state: <b id="roState">idle</b></span>
+          <span>x: <b id="roX">–</b></span>
+          <span>y: <b id="roY">–</b></span>
+          <span>dist: <b id="roDist">0</b>px</span>
+        </div>
+      </div>
+      <div class="code"><pre><span class="tok-kw">const</span> el = document.<span class="tok-fn">querySelector</span>(<span class="tok-str">'movable-el'</span>);
+
+el.<span class="tok-fn">addEventListener</span>(<span class="tok-str">'move'</span>, ({ detail }) =&gt; {
+  console.<span class="tok-fn">log</span>(detail.coords, detail.totalDist);
+});
+
+el.onmoveend = (state) =&gt;
+  console.<span class="tok-fn">log</span>(state.posLeft, state.posTop);</pre></div>
+    </section>
+
+    <!-- 8 · Disabled -->
+    <section class="card">
+      <div class="card-head">
+        <span class="chip">State</span>
+        <h3>Disabled toggle</h3>
+        <p>Flip the <code>disabled</code> attribute to freeze a movable in place — useful while a form is submitting or a layout is locked.</p>
+      </div>
+      <div class="stage">
+        <span class="stage-label">live demo</span>
+        <movable-el id="disabledDemo" disabled>
+          <div class="box b-green" id="disabledBox">I'm frozen — enable me below</div>
+        </movable-el>
+        <button id="disableToggle" style="
+          position:absolute; bottom:12px; right:12px; z-index:2;
+          font:600 12px 'Inter',sans-serif; color:#e6edf3; cursor:pointer;
+          background:#2c3a56; border:1px solid #3b4a66; border-radius:8px; padding:7px 13px;">
+          Enable dragging
+        </button>
+      </div>
+      <div class="code"><pre><span class="tok-tag">&lt;movable-el</span> <span class="tok-attr">disabled</span><span class="tok-tag">&gt;</span>
+  <span class="tok-tag">&lt;div&gt;</span>I can't be dragged<span class="tok-tag">&lt;/div&gt;</span>
+<span class="tok-tag">&lt;/movable-el&gt;</span>
+
+<span class="tok-com">// toggle from JS</span>
+el.disabled = <span class="tok-num">false</span>;</pre></div>
+    </section>
+
   </div>
+
+  <div class="section-head">
+    <h2>Attribute reference</h2>
+    <p>Everything is an attribute (and reflected property) — no JS required for the common cases.</p>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>posTop</code> / <code>posLeft</code></td><td>Number</td><td>Initial / reflected <code>top</code> / <code>left</code> in px. Set these <strong>before</strong> bounds when both change in one update.</td></tr>
+        <tr><td><code>targetSelector</code></td><td>String</td><td>CSS selector for the element that moves (default: the <code>&lt;movable-el&gt;</code> itself).</td></tr>
+        <tr><td><code>boundsX</code> / <code>boundsY</code></td><td>String</td><td><strong>Relative</strong> <code>"min,max"</code> offsets from the current position — not document coords. <code>"null"</code> locks that axis.</td></tr>
+        <tr><td><code>axis</code></td><td><code>"x"</code> | <code>"y"</code></td><td>Lock the other axis to its current position.</td></tr>
+        <tr><td><code>grid</code></td><td>Number</td><td>Snap increment in px (default <code>1</code>).</td></tr>
+        <tr><td><code>dragAfterDist</code></td><td>Number</td><td>Pointer travel in px before a drag starts (default <code>0</code>) — lets clicks pass through.</td></tr>
+        <tr><td><code>shiftBehavior</code></td><td>Boolean</td><td>With open bounds, holding Shift constrains movement to the dominant axis.</td></tr>
+        <tr><td><code>disabled</code></td><td>Boolean</td><td>Disable dragging entirely.</td></tr>
+        <tr><td><code>eventsOnly</code></td><td>Boolean</td><td>Fire events without repositioning the target — drive your own transforms.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    <span><strong>lit-movable</strong> · MIT licensed · by <a href="https://github.com/thewebkid" target="_blank" rel="noopener">thewebkid</a></span>
+    <span>Also registered as <code style="font-family:'JetBrains Mono',monospace">&lt;lit-movable&gt;</code> for 0.x compatibility</span>
+  </footer>
+
 </div>
+
+<script type="module">
+  // Events demo readout
+  const demo = document.getElementById('eventsDemo');
+  const roState = document.getElementById('roState');
+  const roX = document.getElementById('roX');
+  const roY = document.getElementById('roY');
+  const roDist = document.getElementById('roDist');
+
+  demo.addEventListener('movestart', () => {
+    roState.textContent = 'dragging';
+    roState.classList.add('live');
+  });
+  demo.addEventListener('move', ({ detail }) => {
+    roX.textContent = Math.round(detail.coords.x);
+    roY.textContent = Math.round(detail.coords.y);
+    roDist.textContent = Math.round(Math.hypot(detail.totalDist.x, detail.totalDist.y));
+  });
+  demo.addEventListener('moveend', () => {
+    roState.textContent = 'idle';
+    roState.classList.remove('live');
+  });
+
+  // Disabled toggle demo
+  const disabledDemo = document.getElementById('disabledDemo');
+  const disabledBox = document.getElementById('disabledBox');
+  const toggleBtn = document.getElementById('disableToggle');
+  const syncDisabledUi = () => {
+    const off = disabledDemo.disabled;
+    toggleBtn.textContent = off ? 'Enable dragging' : 'Disable dragging';
+    disabledBox.textContent = off ? "I'm frozen — enable me below" : 'Drag me! (or disable me again)';
+    disabledBox.style.filter = off ? 'grayscale(.6) brightness(.75)' : 'none';
+  };
+  toggleBtn.addEventListener('click', () => {
+    disabledDemo.disabled = !disabledDemo.disabled;
+    syncDisabledUi();
+  });
+  syncDisabledUi();
+</script>
 </body>
 </html>
